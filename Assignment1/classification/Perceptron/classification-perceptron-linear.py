@@ -63,7 +63,7 @@ def perceptron(class_0,class_1,weights):
     err_limit = 1e-3
     
     # learning rate
-    eta = 0.1
+    eta = 0.001
     
     # epochs
     err_last = 1e9
@@ -184,7 +184,7 @@ def get_data(input_path,no_of_classes):
 no_of_classes=3
 input_dimension=2
 rows_per_class=500
-input_path="./Group21/Classification/LS_Group21/Class"
+input_path=r"../../Group21/Classification/LS_Group21/Class"
 
 # ----read data from file -----
 # data[i] --> data of class with label=i

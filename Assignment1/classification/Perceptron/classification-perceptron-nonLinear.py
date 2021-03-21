@@ -64,7 +64,7 @@ def perceptron(class_0,class_1,weights):
     
     # learning rate
     eta = 0.1
-    
+    error_array=[]
     # epochs
     err_last = 1e9
     while(1):
@@ -86,12 +86,13 @@ def perceptron(class_0,class_1,weights):
         
         
         err=error(class_0,class_1,weights)
-
+        error_array.append(err)
         if (abs(err - err_last) < err_limit):
             break
         
         err_last = err
-        
+    plt.plot(error_array)
+    plt.show()      
     return weights    
 
 
@@ -186,7 +187,7 @@ def get_data(input_path,no_of_classes,rows_per_class):
 no_of_classes=2
 input_dimension=2
 rows_per_class=2446
-input_path="./Group21/Classification/NLS_Group21.txt"
+input_path=r"../../Group21/Classification/NLS_Group21.txt"
 
 
 # ----read data from file -----
