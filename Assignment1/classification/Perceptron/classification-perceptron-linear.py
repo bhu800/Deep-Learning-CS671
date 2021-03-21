@@ -3,6 +3,8 @@
 # =============================================================================
 import numpy as np
 import pandas as pd
+from sklearn import metrics
+import matplotlib.pyplot as plt
 
 # =============================================================================
 # Functions
@@ -98,7 +100,7 @@ def perceptron(class_0,class_1,weights):
 # w[i][j][-1] --> bias
 def perceptron_weights(train,no_of_classes):
     # initialize
-    W=np.ones((no_of_classes,no_of_classes,input_dimension+1))
+    W=np.zeros((no_of_classes,no_of_classes,input_dimension+1))
     
     # find weights of perceptrons
     # call like this --> perceptron(classi, classj)  ==> label(classi) < label(classj)
@@ -128,7 +130,6 @@ def predict_test_data_class(test,W, no_of_classes):
                 else:
                     test_data_info[i][j]+=1
     
-    print(test_data_info)
     # predicted class label
     predicted_test_class=np.argmax(test_data_info,axis=1)
     return predicted_test_class
@@ -194,9 +195,45 @@ data=np.append(data,np.ones((no_of_classes,rows_per_class,1)),axis=2)
 # split data --> train,validate,test
 train,validate,test,actual_test_class=split_data(data,no_of_classes)
 
-# perceptron weights
+# ------- perceptron weights -------
 W=perceptron_weights(train,no_of_classes)
 
-# predict class label
+# true class label
+# assumption - all classes have equal test examples, class0 class1 ...... class[no_of_classes-1]
+true_test_class=np.array([])
+for i in range(no_of_classes):
+    true_test_class=np.append(true_test_class,np.zeros(int(len(test)/3)) + i)
+    
+# ------ predict class label --------
 predict_test_class=predict_test_data_class(test,W,no_of_classes)
 
+
+# =============================================================================
+# Results
+# =============================================================================
+# confusion matrix
+confusion_matrix=metrics.confusion_matrix(true_test_class, predict_test_class)
+print("Confusion matrix:-")
+print(confusion_matrix)
+
+
+# Visualising the Decision Region
+from matplotlib.colors import ListedColormap
+X_set=test
+y_set = predict_test_class
+# create a grid in 2d plane
+X1, X2 = np.meshgrid(np.arange(start = X_set[:, 0].min() - 100, stop = X_set[:, 0].max() + 100, step = 1),
+                     np.arange(start = X_set[:, 1].min() - 100, stop = X_set[:, 1].max() + 100, step = 1))
+# plot contours with predicted output/label as height of contour
+plt.contourf(X1, X2, predict_test_data_class(np.array([X1.ravel(), X2.ravel(),np.ones(X1.ravel().shape[0])]).T,W,no_of_classes).reshape(X1.shape),
+             alpha = 0.5, cmap = ListedColormap(('red', 'green', 'blue')))
+# plot test data
+for i, j in enumerate(np.unique(y_set)):
+    plt.scatter(X_set[y_set == j, 0], X_set[y_set == j, 1], c = ListedColormap(('red', 'green','blue'))(i), label = "class "+ str(j+1))
+plt.xlim(X1.min(), X1.max())
+plt.ylim(X2.min(), X2.max())
+plt.title('Decision Region')
+plt.xlabel("dimension-1 (data[0])")
+plt.ylabel("dimension-2 (data[1])")
+plt.legend()
+plt.show()
