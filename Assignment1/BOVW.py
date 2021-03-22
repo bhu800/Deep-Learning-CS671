@@ -126,4 +126,4 @@ for img_type, img_hist_array in train_imgs_hist.items():
         img_BoVW[i] = BoVW_image_feature_vector(img_hist_array[i], centroids)
     img_BoVW_all[img_type] = img_BoVW
 
-img_BoVW_all["batters_box"]
+img_BoVW_all["batters_box"][0]
