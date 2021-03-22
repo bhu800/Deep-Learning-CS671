@@ -173,9 +173,25 @@ W=perceptron_weights(train)
 # predict class label
 predicted=predict_test_data_class(test,W)
 
-plt.scatter(test[0],test[2])
-plt.scatter(test[0],predicted)
+plt.scatter(test[0],test[2],label='Original')
+plt.scatter(test[0],predicted,label='Predicted')
+plt.title('Test Data')
+plt.legend()
+plt.show()
+predicted=predict_test_data_class(validate,W)
 
+plt.scatter(validate[0],validate[2],label='Original')
+plt.scatter(validate[0],predicted,label='Predicted')
+plt.title('Validation Data')
+plt.legend()
+plt.show()
+predicted=predict_test_data_class(train,W)
+
+plt.scatter(train[0],train[2],label='Original')
+plt.scatter(train[0],predicted,label='Predicted')
+plt.title('Train Data')
+plt.legend()
+plt.show()
 '''
 fig = plt.figure()
 ax = plt.axes(projection='3d')
@@ -183,5 +199,27 @@ ax = plt.axes(projection='3d')
 ax.scatter3D(test[0], test[1], test[3], c=test[3], cmap='Greens');
 ax.scatter3D(test[0], test[1], predicted, c=predicted, cmap='viridis');
 '''
+predicted=predict_test_data_class(test,W)
+
+plt.scatter(actual_test_class,predicted)
+plt.xlabel('original')
+plt.ylabel('predicted')
+plt.title('Test Data')
+plt.legend()
 plt.show()
-plt.scatter(predicted,actual_test_class)
+predicted=predict_test_data_class(validate,W)
+
+plt.scatter(validate[2],predicted)
+plt.xlabel('original')
+plt.ylabel('predicted')
+plt.title('Validate Data')
+plt.legend()
+plt.show()
+predicted=predict_test_data_class(train,W)
+
+plt.scatter(train[2],predicted)
+plt.xlabel('original')
+plt.ylabel('predicted')
+plt.title('Train Data')
+plt.legend()
+plt.show()
