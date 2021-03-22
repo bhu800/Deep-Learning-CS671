@@ -10,20 +10,21 @@ def kmeans(x, k, no_of_iterations):
     idx = np.random.choice(len(x), k, replace=False)
     print(idx)
     #Randomly choosing Centroids 
-    centroids = x[idx, :] #Step 1
+    centroids = x[idx, :] 
      
     #finding the distance between centroids and all the data points
-    distances = cdist(x, centroids ,'euclidean') #Step 2
+    distances = cdist(x, centroids ,'euclidean') 
      
     #Centroid with the minimum Distance
-    points = np.array([np.argmin(i) for i in distances]) #Step 3
+    points = np.array([np.argmin(i) for i in distances]) 
     
+    # just to ensure that there is no problem due to any 
+    # 2 random centroids accidently being equal
     for i in range(k):
         points[idx[i]] = i
         
     
     #Repeating the above steps for a defined number of iterations
-    #Step 4
     for itr in range(no_of_iterations): 
         centroids = []
         print(f"*** Iteration {itr} ***")
@@ -40,6 +41,10 @@ def kmeans(x, k, no_of_iterations):
          
     return centroids
 
+""" 
+pads the image with itself, if image is not completely
+dividable in patches of patch_shape
+"""
 def padImageForPatches(img, patch_shape):
     return cv2.copyMakeBorder(src=img, left=0, right=patch_shape[1]*((img.shape[1]+31)//patch_shape[1])-img.shape[1], top=0, bottom=patch_shape[0]*((img.shape[0]+31)//patch_shape[0])-img.shape[0], borderType=cv2.BORDER_REFLECT)
 
