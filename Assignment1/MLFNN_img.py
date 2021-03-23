@@ -3,7 +3,8 @@
 # %%
 import numpy as np
 import os
-
+from BOVW import img_BoVW_all
+from scipy.special import expit
 # %% [markdown]
 # $z^{x, l}= w^{l}a^{x, l-1} + b^{l}$ and $a^{x, l} = \sigma(z^{x, l})$
 
@@ -11,7 +12,7 @@ import os
 class MLFFNN:
 
     # constructor to initialize instance of class
-    def __init__(self, layers_size = [2, 6, 3]):
+    def __init__(self, layers_size = [32, 300, 100, 50, 3]):
         self.layers_size = layers_size
         self.biases = []
         self.weights = []
@@ -32,6 +33,7 @@ class MLFFNN:
             # print("--> ", w.shape, a.shape, b.shape)
             z = np.matmul(w, a) + b # z_l = w_l * a_l-1 + b_l
             Z.append(z)
+            z=z.astype('float64')
             a = self.sigmoid_activation(z)
             # print("z = ", z.shape)
             # print("a = ", a.shape)
@@ -49,7 +51,7 @@ class MLFFNN:
         del_C_by_del_b = [np.zeros(b.shape) for b in self.biases]
         del_C_by_del_w = [np.zeros(w.shape) for w in self.weights]
         # print("debug--> ", A[-1].shape, y.shape, self.sigmoid_derivative(Z[-1]).shape)
-        del_ = (A[-1] - y.reshape(-1, 1)) * self.sigmoid_derivative(Z[-1]) # del_ = del_C_by_del_z
+        del_ = (A[-1] - y.reshape(-1, 1)) * self.sigmoid_derivative(Z[-1].astype('float64')) # del_ = del_C_by_del_z
         # print("debug - del_", del_.shape)
         del_C_by_del_b[-1] = del_
         del_C_by_del_w[-1] = np.matmul(del_, A[-2].T)
@@ -59,6 +61,7 @@ class MLFFNN:
             # print("*** Debug2***")
             # print(self.weights[-l+1].T.shape, del_.shape)
             # print("*********")
+            z=z.astype('float64')
             del_ = np.matmul(self.weights[-l+1].T, del_) * self.sigmoid_derivative(z)
             del_C_by_del_b[-l] = del_
             # print("*** Debug3***")
@@ -75,6 +78,7 @@ class MLFFNN:
         sum_delC_by_del_w = [np.zeros(w.shape) for w in self.weights]
 
         for i in range(len(X)):
+            
             # foward pass
             A, Z = self.feedForward(X[i])
             # backward pass
@@ -110,19 +114,19 @@ class MLFFNN:
         return accuracy
 
     def sigmoid_activation(self, z):
-        return 1.0/(1.0+np.exp(-z))
+        return expit(z)
 
     def sigmoid_derivative(self, z):
-        return np.exp(-z)/((1.0+np.exp(-z))**2)
+        return expit(z)*(1-expit(z))
 
 
         
 
 
 # %%
-c1 = np.loadtxt("./Group21/Classification/LS_Group21/Class1.txt")
-c2 = np.loadtxt("./Group21/Classification/LS_Group21/Class2.txt")
-c3 = np.loadtxt("./Group21/Classification/LS_Group21/Class3.txt")
+c1 = img_BoVW_all['batters_box']
+c2 = img_BoVW_all['racecourse']
+c3 = img_BoVW_all['tree_farm']
 
 
 # %%
@@ -131,7 +135,7 @@ c2 = np.append(c2, np.full((c2.shape[0], 3), [0, 1, 0]), axis=1)
 c3 = np.append(c3, np.full((c3.shape[0], 3), [0, 0, 1]), axis=1)
 
 data = np.concatenate((c1, c2, c3), axis=0)
-#np.random.shuffle(data)
+np.random.shuffle(data)
 test_data = data[:int(.3*data.shape[0]), :]
 train_data = data[int(.3*data.shape[0]):, :]
 
@@ -140,7 +144,7 @@ train_data = data[int(.3*data.shape[0]):, :]
 train_data[:, -1].reshape(-1, 1).reshape(-1)
 # %%
 net = MLFFNN()
-net.train(train_data[:, :-3], train_data[:, 2:], test_data[:, :-3], test_data[:, 2:], epochs=100, eta=1)
+net.train(train_data[:, :-3], train_data[:, 32:], test_data[:, :-3], test_data[:, 32:], epochs=10000, eta=10)
 
 
 # %%
