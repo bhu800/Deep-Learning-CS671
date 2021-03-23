@@ -61,7 +61,7 @@ def perceptron(data,weights):
     error_array=[]
     
     # learning rate
-    eta = 0.01
+    eta = 0.0001
     
     # epochs
     err_last = 1e3
@@ -179,9 +179,45 @@ plt.scatter(test[0],predicted)
 '''
 fig = plt.figure()
 ax = plt.axes(projection='3d')
+ax.scatter3D(test[0], test[1], predicted, c=predicted,cmap='prism',label='Predicted');
+ax.scatter3D(test[0], test[1], test[3], c=test[3], cmap='Greens',label='Original');
 
-ax.scatter3D(test[0], test[1], test[3], c=test[3], cmap='Greens');
-ax.scatter3D(test[0], test[1], predicted, c=predicted, cmap='viridis');
-
+plt.title('Test Data')
+plt.legend()
 plt.show()
-plt.scatter(predicted,actual_test_class)
+plt.scatter(predicted,test[3])
+plt.xlabel('Actual')
+plt.ylabel('Predicted')
+plt.title('Test Data')
+plt.legend()
+plt.show()
+predicted=predict_test_data_class(validate,W)
+fig = plt.figure()
+ax = plt.axes(projection='3d')
+ax.scatter3D(validate[0], validate[1], predicted, c=predicted, cmap='prism',label='Predicted');
+ax.scatter3D(validate[0], validate[1], validate[3], c=validate[3], cmap='Greens',label='Original');
+
+plt.title('Validate Data')
+plt.legend()
+plt.show()
+plt.scatter(predicted,validate[3])
+plt.xlabel('Actual')
+plt.ylabel('Predicted')
+plt.title('Validate Data')
+plt.legend()
+plt.show()
+predicted=predict_test_data_class(train,W)
+fig = plt.figure()
+ax = plt.axes(projection='3d')
+ax.scatter3D(train[0], train[1], predicted, c=predicted,cmap='prism',label='Predicted');
+ax.scatter3D(train[0], train[1], train[3], c=train[3], cmap='Greens',label='Original');
+
+plt.title('Train Data')
+plt.legend()
+plt.show()
+plt.scatter(predicted,train[3])
+plt.xlabel('Actual')
+plt.ylabel('Predicted')
+plt.title('Train Data')
+plt.legend()
+plt.show()
