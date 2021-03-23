@@ -154,7 +154,7 @@ train_data[:, -1].reshape(-1, 1).reshape(-1)
 
 
 net = MLFFNN()
-net.train(train_data[:, :-2], train_data[:, 2:], test_data[:, :-2], test_data[:, 2:], epochs=5000, eta=1)
+net.train(train_data[:, :-2], train_data[:, 2:], test_data[:, :-2], test_data[:, 2:], epochs=10000, eta=1)
 
 
 # In[ ]:
