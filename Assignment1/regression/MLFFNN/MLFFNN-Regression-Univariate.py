@@ -108,6 +108,9 @@ class MLFFNN:
         # Y = Y.reshape(-1)
         pred = np.apply_along_axis(self.predictValue, axis=1, arr=X)
         '''pred = []
+        for i in range(0,n):
+            x=net.predictValue(X[i])
+            pred.append(x)'''
 #        Y = np.matmul(Y, np.arange(Y.shape[-1]))
         # print("Debug")
         # print(pred.shape, Y.shape)
