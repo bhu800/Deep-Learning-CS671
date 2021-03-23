@@ -4,25 +4,6 @@
 import numpy as np
 import os
 
-
-# %%
-path = "./Group21/Classification/LS_Group21"
-
-
-# %%
-def loadData(dir_path):
-    data = {}
-    
-    for subdir_class in os.listdir(dir_path):
-        subdir_class_path = dir_path + "/" + subdir_class
-        data[os.path.splitext(subdir_class)[0]] = np.loadtxt(subdir_class_path)
-    
-    return data
-
-
-# %%
-data = loadData(path)
-
 # %% [markdown]
 # $z^{x, l}= w^{l}a^{x, l-1} + b^{l}$ and $a^{x, l} = \sigma(z^{x, l})$
 
@@ -49,8 +30,8 @@ class MLFFNN:
 
         for b, w in zip(self.biases, self.weights):
             # print("--> ", w.shape, a.shape, b.shape)
-            z = np.dot(w, a) + b # z_l = w_l * a_l-1 + b_l
-            Z.append(z.reshape(-1, 1))
+            z = np.matmul(w, a) + b # z_l = w_l * a_l-1 + b_l
+            Z.append(z)
             a = self.sigmoid_activation(z)
             # print("z = ", z.shape)
             # print("a = ", a.shape)
@@ -67,9 +48,9 @@ class MLFFNN:
         # print("*********")
         del_C_by_del_b = [np.zeros(b.shape) for b in self.biases]
         del_C_by_del_w = [np.zeros(w.shape) for w in self.weights]
-
-        del_ = (A[-1] - y) * self.sigmoid_derivative(Z[-1]) # del_ = del_C_by_del_z
-
+        # print("debug--> ", A[-1].shape, y.shape, self.sigmoid_derivative(Z[-1]).shape)
+        del_ = (A[-1] - y.reshape(-1, 1)) * self.sigmoid_derivative(Z[-1]) # del_ = del_C_by_del_z
+        # print("debug - del_", del_.shape)
         del_C_by_del_b[-1] = del_
         del_C_by_del_w[-1] = np.matmul(del_, A[-2].T)
 
@@ -118,8 +99,9 @@ class MLFFNN:
 
     def test(self, X, Y):
         n = X.shape[0]
-        Y = Y.reshape(-1)
+        # Y = Y.reshape(-1)
         pred = np.apply_along_axis(self.predictClass, axis=1, arr=X)
+        Y = np.matmul(Y, np.arange(Y.shape[-1]))
         # print("Debug")
         # print(pred.shape, Y.shape)
         # print(pred == Y)
@@ -144,25 +126,14 @@ c3 = np.loadtxt("./Group21/Classification/LS_Group21/Class3.txt")
 
 
 # %%
-c1 = np.append(c1, np.full((c1.shape[0], 1), 0), axis=1)
-c2 = np.append(c2, np.full((c2.shape[0], 1), 1), axis=1)
-c3 = np.append(c3, np.full((c3.shape[0], 1), 2), axis=1)
-
-
-# %%
-data = np.concatenate((c1, c2, c3), axis=0)
-np.random.shuffle(data)
-test_data = data[:int(.3*data.shape[0]), :]
-train_data = data[int(.3*data.shape[0]):, :]
-
-
-# %%
-train_data[:, -1].reshape(-1, 1).reshape(-1)
+c1 = np.append(c1, np.full((c1.shape[0], 3), [1, 0, 0]), axis=1)
+c2 = np.append(c2, np.full((c2.shape[0], 3), [0, 1, 0]), axis=1)
+c3 = np.append(c3, np.full((c3.shape[0], 3), [0, 0, 1]), axis=1)
 
 
 # %%
 net = MLFFNN()
-net.train(train_data[:, :-1], train_data[:, -1].reshape(-1, 1), test_data[:, :-1], test_data[:, -1].reshape(-1, 1), epochs=1000, eta=1)
+net.train(train_data[:, :-3], train_data[:, 2:], test_data[:, :-3], test_data[:, 2:], epochs=100, eta=1)
 
 
 # %%
