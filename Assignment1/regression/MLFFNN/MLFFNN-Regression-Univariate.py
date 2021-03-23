@@ -6,15 +6,23 @@ import pandas as pd
 import matplotlib.pyplot as plt
 # %% [markdown]
 # $z^{x, l}= w^{l}a^{x, l-1} + b^{l}$ and $a^{x, l} = \sigma(z^{x, l})$
+# %%
+# -- data storage --
+avg_error = []
+model_output=[]
+model_output2=[]
 
 # %%
 class MLFFNN:
 
     # constructor to initialize instance of class
-    def __init__(self, layers_size = [2, 6 ,1]):
+    def __init__(self, layers_size = [2, 3, 1]):
         self.layers_size = layers_size
         self.biases = []
         self.weights = []
+        
+        global avg_error
+        avg_error = []
 
         # initialize weights and biases with random values
         for n_neurons in self.layers_size[1:]:
@@ -94,15 +102,32 @@ class MLFFNN:
         self.biases = [b - (eta/n)*s_dcb for b, s_dcb in zip(self.biases, sum_delC_by_del_b)]
 
     def train(self, train_X, train_Y, test_X, test_Y, epochs=100, eta=0.01):
-
+        global avg_error
+        avg_error = []
+        
         for e in range(epochs):
             self.gradientDescent(train_X, train_Y, eta)
+            train_err=self.train_error(train_X,train_Y)
             test_error = self.test(test_X, test_Y)
-            print(f"=== Epoch {e+1}/{epochs} - test error = {test_error} ===\n")
+            print(f"=== Epoch {e+1}/{epochs} - train error = {train_err}, test error = {test_error} ===\n")
+            
+            # model output
+            global model_output
+            global model_output2
+            model_output = np.apply_along_axis(self.predictValue, axis=1, arr=train_X)
 
     def predictValue(self, x):
         return self.feedForward(x, return_final_only=True)
 
+    def train_error(self, X, Y):
+        n = X.shape[0]
+        pred = np.apply_along_axis(self.predictValue, axis=1, arr=X)
+        
+        pred=pred.reshape(len(pred))
+        error=np.sqrt((((pred-Y)**2).sum())/(2*n))
+
+        return error
+    
     def test(self, X, Y):
         n = X.shape[0]
         # Y = Y.reshape(-1)
@@ -117,12 +142,13 @@ class MLFFNN:
         # print(pred == Y)
 #        print(pred,Y)
         #pred=np.array(pred)
-        coll = 0
         
-        for i in range(len(pred)):
-            coll = coll + (Y[i]-pred[i])**2
         
-        error = np.sqrt(coll.sum()/(2*n))
+        pred=pred.reshape(len(pred))
+        error=np.sqrt((((pred-Y)**2).sum())/(2*n))
+        
+        global avg_error
+        avg_error.append(error*error)
 
         return error
 
@@ -167,29 +193,23 @@ data=np.array(data)
 
 # %%
 np.random.shuffle(data)
-test_data = data[:int(.3*data.shape[0]), :]
-train_data = data[int(.3*data.shape[0]):, :]
-
+train_data = data[:int(.6*data.shape[0]), :]
+validation_data = data[int(.6*data.shape[0]):int(.8*data.shape[0]), :]
+test_data = data[int(.8*data.shape[0]):, :]
 # %%
 net = MLFFNN()
-net.train(train_data[:, :-1], train_data[:, -1], test_data[:, :-1], test_data[:, -1], epochs=5000, eta=1)
-a=np.linspace(0,1)
-b=[]
-for i in range(len(a)):
-    x=net.predictValue(np.array([a[i],1]))
-    b.append(x)
-plt.scatter(a,b)
-a=[test_data[i][0] for i in range(0,test_data[:, -1].size)]
-plt.scatter(a, test_data[:, -1])
+net.train(train_data[:, :-1], train_data[:, -1], validation_data[:, :-1], validation_data[:, -1], epochs=100, eta=0.1)
+net.train(train_data[:, :-1], train_data[:, -1], test_data[:, :-1], test_data[:, -1], epochs=100, eta=0.1)
+
+# average error
+plt.scatter(np.arange(1,101,1),avg_error)
+plt.title("Epoch vs AvgError (Regression-Univariate-MLFFNN)")
+plt.xlabel("Epochs")
+plt.ylabel("Average error")
 plt.plot()
-'''
-b=[]
-for i in range(len(a)):
-    x=net.predictValue(np.array([a[i],1]))
-    b.append(x)
-plt.scatter(b, test_data[:, -1])
-plt.plot()
-'''
+
+
+
 # %%
 
 

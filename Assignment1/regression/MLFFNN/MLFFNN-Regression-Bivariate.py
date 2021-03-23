@@ -107,11 +107,8 @@ class MLFFNN:
         n = X.shape[0]
         # Y = Y.reshape(-1)
         pred = np.apply_along_axis(self.predictValue, axis=1, arr=X)
-#        Y = np.matmul(Y, np.arange(Y.shape[-1]))
-        # print("Debug")
-        # print(pred.shape, Y.shape)
-        # print(pred == Y)
-#        print(pred,Y)
+
+        pred=pred.reshape(len(pred))
         error = np.sqrt(((pred - Y)**2).sum()/(2*n))
 
         return error
@@ -145,7 +142,7 @@ def get_data(input_path):
 # %%
 #----- input specs -----
 input_dimension=1
-input_path=r"./Group21/Regression/BivariateData/21.csv"
+input_path=r"../../Group21/Regression/BivariateData/21.csv"
 
 # ----read data from file -----
 data=get_data(input_path)
@@ -166,5 +163,6 @@ net.train(train_data[:, :-1], train_data[:, -1], test_data[:, :-1], test_data[:,
 
 
 # %%
+
 
 
