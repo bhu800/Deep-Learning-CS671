@@ -16,7 +16,7 @@ model_output2=[]
 class MLFFNN:
 
     # constructor to initialize instance of class
-    def __init__(self, layers_size = [2, 3, 1]):
+    def __init__(self, layers_size = [2, 6, 1]):
         self.layers_size = layers_size
         self.biases = []
         self.weights = []
@@ -115,6 +115,7 @@ class MLFFNN:
             global model_output
             global model_output2
             model_output = np.apply_along_axis(self.predictValue, axis=1, arr=train_X)
+            model_output2 = np.apply_along_axis(self.predictValue, axis=1, arr=test_X)
 
     def predictValue(self, x):
         return self.feedForward(x, return_final_only=True)
@@ -143,12 +144,18 @@ class MLFFNN:
 #        print(pred,Y)
         #pred=np.array(pred)
         
+        coll = 0
         
-        pred=pred.reshape(len(pred))
-        error=np.sqrt((((pred-Y)**2).sum())/(2*n))
+        for i in range(len(pred)):
+            coll = coll + (Y[i]-pred[i])**2
         
-        global avg_error
-        avg_error.append(error*error)
+        error = np.sqrt(coll.sum()/(2*n))
+        
+#        pred=pred.reshape(len(pred))
+#        error=np.sqrt((((pred-Y)**2).sum())/(2*n))
+#        
+#        global avg_error
+#        avg_error.append(error*error)
 
         return error
 
@@ -198,17 +205,47 @@ validation_data = data[int(.6*data.shape[0]):int(.8*data.shape[0]), :]
 test_data = data[int(.8*data.shape[0]):, :]
 # %%
 net = MLFFNN()
-net.train(train_data[:, :-1], train_data[:, -1], validation_data[:, :-1], validation_data[:, -1], epochs=100, eta=0.1)
-net.train(train_data[:, :-1], train_data[:, -1], test_data[:, :-1], test_data[:, -1], epochs=100, eta=0.1)
+net.train(train_data[:, :-1], train_data[:, -1], validation_data[:, :-1], validation_data[:, -1], epochs=5000, eta=1)
+#net.train(train_data[:, :-1], train_data[:, -1], test_data[:, :-1], test_data[:, -1], epochs=100, eta=0.1)
 
 # average error
-plt.scatter(np.arange(1,101,1),avg_error)
-plt.title("Epoch vs AvgError (Regression-Univariate-MLFFNN)")
-plt.xlabel("Epochs")
-plt.ylabel("Average error")
+#plt.scatter(np.arange(1,101,1),avg_error)
+#plt.title("Epoch vs AvgError (Regression-Univariate-MLFFNN)")
+#plt.xlabel("Epochs")
+#plt.ylabel("Average error")
+#plt.plot()
+
+# plot output
+plt.scatter(train_data[:, 0], train_data[:, -1],c='blue',label='target')
+plt.scatter(train_data[:, 0], model_output,c='orange',label='model')
+plt.title('Train data plot')
+plt.xlabel('input')
+plt.ylabel('output')
+plt.legend()
+plt.show()
+
+plt.scatter(validation_data[:, 0], validation_data[:, -1],c='blue',label='target')
+plt.scatter(validation_data[:, 0], model_output2,c='orange',label='model')
+plt.title('Test data plot')
+plt.xlabel('input')
+plt.ylabel('output')
+plt.legend()
+plt.show()
+
+# target vs model output
+plt.scatter(train_data[:, -1], model_output)
+plt.title("Train - Output comparison")
+plt.xlabel("Target output")
+plt.ylabel("Model output")
 plt.plot()
+plt.show()
 
-
+plt.scatter(validation_data[:, -1], model_output2)
+plt.title("Test - Output comparison")
+plt.xlabel("Target output")
+plt.ylabel("Model output")
+plt.plot()
+plt.show()
 
 # %%
 
