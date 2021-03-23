@@ -20,6 +20,7 @@ class MLFFNN:
         self.layers_size = layers_size
         self.biases = []
         self.weights = []
+        self.A = []
 
         # initialize weights and biases with random values
         for n_neurons in self.layers_size[1:]:
@@ -29,7 +30,7 @@ class MLFFNN:
 
     def feedForward(self, x, return_final_only=False):
         a = x.reshape(-1, 1) # activation vector of a single layer, in this case input layer 
-        A = [x.reshape(-1, 1)] # list for activation vectors for every layer
+        self.A = [x.reshape(-1, 1)] # list for activation vectors for every layer
 
         Z = [] # list for weighted input vectors for every layer
 
@@ -40,12 +41,12 @@ class MLFFNN:
             a = self.sigmoid_activation(z)
             # print("z = ", z.shape)
             # print("a = ", a.shape)
-            A.append(a)
+            self.A.append(a)
 
         if (return_final_only):
             return a
         else:
-            return (A, Z)
+            return (self.A, Z)
 
     def backPropagation(self, A, Z, y):
         # print("*** Debug***")
@@ -154,7 +155,7 @@ train_data[:, -1].reshape(-1, 1).reshape(-1)
 
 
 net = MLFFNN()
-net.train(train_data[:, :-2], train_data[:, 2:], test_data[:, :-2], test_data[:, 2:], epochs=10000, eta=1)
+net.train(train_data[:, :-2], train_data[:, 2:], test_data[:, :-2], test_data[:, 2:], epochs=5000, eta=1)
 
 
 # In[ ]:
@@ -174,3 +175,89 @@ for i in range(0,len(grid)):
 zz=np.array(zz)
 zz = zz.reshape(xx.shape)
 plt.contourf(xx, yy, zz, cmap='Paired')
+n=test_data[:, :-2].shape[0]
+layer1=[]
+layer1_val=[]
+for i in range(0,n):
+    a=net.feedForward(test_data[:, :-2][i],return_final_only=True)
+    layer1_val.append(net.A[1][0])
+layer1.append(layer1_val)
+layer1_val=[]
+for i in range(0,n):
+    a=net.feedForward(test_data[:, :-2][i],return_final_only=True)
+    layer1_val.append(net.A[1][10])
+layer1.append(layer1_val)
+layer1_val=[]
+for i in range(0,n):
+    a=net.feedForward(test_data[:, :-2][i],return_final_only=True)
+    layer1_val.append(net.A[1][20])
+layer1.append(layer1_val)
+layer1_val=[]
+for i in range(0,n):
+    a=net.feedForward(test_data[:, :-2][i],return_final_only=True)
+    layer1_val.append(net.A[1][30])
+layer1.append(layer1_val)
+layer1_val=[]
+for i in range(0,n):
+    a=net.feedForward(test_data[:, :-2][i],return_final_only=True)
+    layer1_val.append(net.A[1][40])
+layer1.append(layer1_val)
+layer1_val=[]
+for i in range(0,n):
+    a=net.feedForward(test_data[:, :-2][i],return_final_only=True)
+    layer1_val.append(net.A[1][50])
+layer1.append(layer1_val)
+layer2=[]
+layer2_val=[]
+for i in range(0,n):
+    a=net.feedForward(test_data[:, :-2][i],return_final_only=True)
+    layer2_val.append(net.A[2][0])
+layer2.append(layer2_val)
+layer2_val=[]
+for i in range(0,n):
+    a=net.feedForward(test_data[:, :-2][i],return_final_only=True)
+    layer2_val.append(net.A[2][10])
+layer2.append(layer2_val)
+layer2_val=[]
+for i in range(0,n):
+    a=net.feedForward(test_data[:, :-2][i],return_final_only=True)
+    layer2_val.append(net.A[2][20])
+layer2.append(layer2_val)
+layer2_val=[]
+for i in range(0,n):
+    a=net.feedForward(test_data[:, :-2][i],return_final_only=True)
+    layer2_val.append(net.A[2][30])
+layer2.append(layer2_val)
+layer2_val=[]
+for i in range(0,n):
+    a=net.feedForward(test_data[:, :-2][i],return_final_only=True)
+    layer2_val.append(net.A[2][40])
+layer2.append(layer2_val)
+layer3=[]
+layer3_val=[]
+for i in range(0,n):
+    a=net.feedForward(test_data[:, :-2][i],return_final_only=True)
+    layer3_val.append(net.A[3][0])
+layer3.append(layer3_val)
+layer3_val=[]
+for i in range(0,n):
+    a=net.feedForward(test_data[:, :-2][i],return_final_only=True)
+    layer3_val.append(net.A[3][1])
+layer3.append(layer3_val)
+xxx = [test_data[:, :-2][i][0] for i in range(0,1467)]
+yyy = [test_data[:, :-2][i][1] for i in range(0,1467)]
+for i in range(0,len(layer1)):
+    fig = plt.figure()
+
+    ax = plt.axes(projection='3d')
+    ax.scatter3D(xxx, yyy, layer1[i], c=layer1[i],cmap='plasma');
+for i in range(0,len(layer2)):
+    fig = plt.figure()
+
+    ax = plt.axes(projection='3d')
+    ax.scatter3D(xxx, yyy, layer2[i], c=layer2[i],cmap='plasma');
+for i in range(0,len(layer3)):
+    fig = plt.figure()
+
+    ax = plt.axes(projection='3d')
+    ax.scatter3D(xxx, yyy, layer3[i], c=layer3[i],cmap='plasma');
