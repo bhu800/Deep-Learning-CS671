@@ -3,7 +3,7 @@
 # %%
 import numpy as np
 import os
-
+import matplotlib.pyplot as plt
 # %% [markdown]
 # $z^{x, l}= w^{l}a^{x, l-1} + b^{l}$ and $a^{x, l} = \sigma(z^{x, l})$
 
@@ -15,7 +15,8 @@ class MLFFNN:
         self.layers_size = layers_size
         self.biases = []
         self.weights = []
-
+        self.A = []
+        self.er =[]
         # initialize weights and biases with random values
         for n_neurons in self.layers_size[1:]:
             self.biases.append(np.random.randn(n_neurons, 1))
@@ -24,7 +25,7 @@ class MLFFNN:
 
     def feedForward(self, x, return_final_only=False):
         a = x.reshape(-1, 1) # activation vector of a single layer, in this case input layer 
-        A = [x.reshape(-1, 1)] # list for activation vectors for every layer
+        self.A = [x.reshape(-1, 1)] # list for activation vectors for every layer
 
         Z = [] # list for weighted input vectors for every layer
 
@@ -35,12 +36,12 @@ class MLFFNN:
             a = self.sigmoid_activation(z)
             # print("z = ", z.shape)
             # print("a = ", a.shape)
-            A.append(a)
+            self.A.append(a)
 
         if (return_final_only):
             return a
         else:
-            return (A, Z)
+            return (self.A, Z)
 
     def backPropagation(self, A, Z, y):
         # print("*** Debug***")
@@ -93,6 +94,7 @@ class MLFFNN:
             self.gradientDescent(train_X, train_Y, eta)
             test_accuracy = self.test(test_X, test_Y)
             print(f"=== Epoch {e+1}/{epochs} - test accuracy = {test_accuracy*100}% ===\n")
+            self.er.append((100-test_accuracy)/100)
 
     def predictClass(self, x):
         return np.argmax(self.feedForward(x, return_final_only=True))
@@ -140,10 +142,76 @@ train_data = data[int(.3*data.shape[0]):, :]
 train_data[:, -1].reshape(-1, 1).reshape(-1)
 # %%
 net = MLFFNN()
-net.train(train_data[:, :-3], train_data[:, 2:], test_data[:, :-3], test_data[:, 2:], epochs=100, eta=1)
+net.train(train_data[:, :-3], train_data[:, 2:], test_data[:, :-3], test_data[:, 2:], epochs=500, eta=10)
 
 
 # %%
 
+min1, max1 = -20,30
+min2, max2 = -20,30
+x1grid = np.arange(min1, max1, 0.1)
+x2grid = np.arange(min2, max2, 0.1)
+xx, yy = np.meshgrid(x1grid, x2grid)
+r1, r2 = xx.flatten(), yy.flatten()
+r1, r2 = r1.reshape((len(r1), 1)), r2.reshape((len(r2), 1))
+# horizontal stack vectors to create x1,x2 input for the model
+grid = np.hstack((r1,r2))
+zz=[]
+for i in range(0,len(grid)):
+    x=net.predictClass(grid[i])
+    zz.append(x)
+zz=np.array(zz)
+zz = zz.reshape(xx.shape)
+plt.contourf(xx, yy, zz, cmap='Paired')
 
+n=test_data[:, :-3].shape[0]
+layer1=[]
+layer1_val=[]
+for i in range(0,n):
+    a=net.feedForward(test_data[:, :-3][i],return_final_only=True)
+    layer1_val.append(net.A[1][0])
+layer1.append(layer1_val)
+layer1_val=[]
+for i in range(0,n):
+    a=net.feedForward(test_data[:, :-3][i],return_final_only=True)
+    layer1_val.append(net.A[1][1])
+layer1.append(layer1_val)
+layer1_val=[]
+for i in range(0,n):
+    a=net.feedForward(test_data[:, :-3][i],return_final_only=True)
+    layer1_val.append(net.A[1][2])
+layer1.append(layer1_val)
+layer2=[]
+layer2_val=[]
+for i in range(0,n):
+    a=net.feedForward(test_data[:, :-3][i],return_final_only=True)
+    layer2_val.append(net.A[2][0])
+layer2.append(layer2_val)
+layer2_val=[]
+for i in range(0,n):
+    a=net.feedForward(test_data[:, :-3][i],return_final_only=True)
+    layer2_val.append(net.A[2][1])
+layer2.append(layer2_val)
+layer2_val=[]
+for i in range(0,n):
+    a=net.feedForward(test_data[:, :-3][i],return_final_only=True)
+    layer2_val.append(net.A[2][2])
+layer2.append(layer2_val)
+xxx = [test_data[:, :-2][i][0] for i in range(0,450)]
+yyy = [test_data[:, :-2][i][1] for i in range(0,450)]
+for i in range(0,len(layer1)):
+    fig = plt.figure()
 
+    ax = plt.axes(projection='3d')
+    ax.scatter3D(xxx, yyy, layer1[i], c=layer1[i],cmap='plasma');
+xxx = [test_data[:, :-2][i][0] for i in range(0,450)]
+yyy = [test_data[:, :-2][i][1] for i in range(0,450)]
+for i in range(0,len(layer2)):
+    fig = plt.figure()
+
+    ax = plt.axes(projection='3d')
+    ax.scatter3D(xxx, yyy, layer2[i], c=layer2[i],cmap='plasma');
+plt.show()
+plt.plot(net.er)
+plt.xlabel('Epochs')
+plt.ylabel('Avg_Error')

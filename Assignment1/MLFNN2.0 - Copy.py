@@ -21,7 +21,7 @@ class MLFFNN:
         self.biases = []
         self.weights = []
         self.A = []
-
+        self.er =[]
         # initialize weights and biases with random values
         for n_neurons in self.layers_size[1:]:
             self.biases.append(np.random.randn(n_neurons, 1))
@@ -99,7 +99,7 @@ class MLFFNN:
             self.gradientDescent(train_X, train_Y, eta)
             test_accuracy = self.test(test_X, test_Y)
             print(f"=== Epoch {e+1}/{epochs} - test accuracy = {test_accuracy*100}% ===\n")
-
+            self.er.append((100-test_accuracy)/100)
     def predictClass(self, x):
         return np.argmax(self.feedForward(x, return_final_only=True))
 
@@ -261,3 +261,7 @@ for i in range(0,len(layer3)):
 
     ax = plt.axes(projection='3d')
     ax.scatter3D(xxx, yyy, layer3[i], c=layer3[i],cmap='plasma');
+plt.show()
+plt.plot(net.er)
+plt.xlabel('Epochs')
+plt.ylabel('Avg_Error')
