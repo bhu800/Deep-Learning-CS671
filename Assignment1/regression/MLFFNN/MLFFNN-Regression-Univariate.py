@@ -3,7 +3,7 @@
 # %%
 import numpy as np
 import pandas as pd
-
+import matplotlib.pyplot as plt
 # %% [markdown]
 # $z^{x, l}= w^{l}a^{x, l-1} + b^{l}$ and $a^{x, l} = \sigma(z^{x, l})$
 
@@ -11,7 +11,7 @@ import pandas as pd
 class MLFFNN:
 
     # constructor to initialize instance of class
-    def __init__(self, layers_size = [2, 6, 1]):
+    def __init__(self, layers_size = [2, 6 ,1]):
         self.layers_size = layers_size
         self.biases = []
         self.weights = []
@@ -107,12 +107,19 @@ class MLFFNN:
         n = X.shape[0]
         # Y = Y.reshape(-1)
         pred = np.apply_along_axis(self.predictValue, axis=1, arr=X)
+        '''pred = []
 #        Y = np.matmul(Y, np.arange(Y.shape[-1]))
         # print("Debug")
         # print(pred.shape, Y.shape)
         # print(pred == Y)
 #        print(pred,Y)
-        error = np.sqrt(((pred - Y)**2).sum()/(2*n))
+        #pred=np.array(pred)
+        coll = 0
+        
+        for i in range(len(pred)):
+            coll = coll + (Y[i]-pred[i])**2
+        
+        error = np.sqrt(coll.sum()/(2*n))
 
         return error
 
@@ -145,7 +152,7 @@ def get_data(input_path):
 # %%
 #----- input specs -----
 input_dimension=1
-input_path=r"./Group21/Regression/UnivariateData/21.csv"
+input_path=r"../../Group21/Regression/UnivariateData/21.csv"
 
 # ----read data from file -----
 data=get_data(input_path)
@@ -162,9 +169,24 @@ train_data = data[int(.3*data.shape[0]):, :]
 
 # %%
 net = MLFFNN()
-net.train(train_data[:, :-1], train_data[:, -1], test_data[:, :-1], test_data[:, -1], epochs=1000, eta=0.01)
-
-
+net.train(train_data[:, :-1], train_data[:, -1], test_data[:, :-1], test_data[:, -1], epochs=5000, eta=1)
+a=np.linspace(0,1)
+b=[]
+for i in range(len(a)):
+    x=net.predictValue(np.array([a[i],1]))
+    b.append(x)
+plt.scatter(a,b)
+a=[test_data[i][0] for i in range(0,test_data[:, -1].size)]
+plt.scatter(a, test_data[:, -1])
+plt.plot()
+'''
+b=[]
+for i in range(len(a)):
+    x=net.predictValue(np.array([a[i],1]))
+    b.append(x)
+plt.scatter(b, test_data[:, -1])
+plt.plot()
+'''
 # %%
 
 
