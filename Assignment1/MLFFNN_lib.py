@@ -1,5 +1,6 @@
 import numpy as np
 import os
+import sklearn
 
 class MLFFNN:
 
@@ -124,6 +125,9 @@ class MLFFNN:
         accuracy = (pred == Y).sum()/n
 
         return accuracy, MSE
+
+    def getConfusionMatrix(self):
+        return sklearn.metrics.confusion_matrix(self.actual_test_lables, self.predicted_test_lables)
 
     def sigmoid_activation(self, z):
         return 1.0/(1.0+np.exp(-z))
