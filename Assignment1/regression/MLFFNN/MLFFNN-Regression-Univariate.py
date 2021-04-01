@@ -20,7 +20,7 @@ class MLFFNN:
         self.layers_size = layers_size
         self.biases = []
         self.weights = []
-        
+        self.A = []
         global avg_error
         avg_error = []
 
@@ -32,7 +32,7 @@ class MLFFNN:
 
     def feedForward(self, x, return_final_only=False):
         a = x.reshape(-1, 1) # activation vector of a single layer, in this case input layer 
-        A = [x.reshape(-1, 1)] # list for activation vectors for every layer
+        self.A = [x.reshape(-1, 1)] # list for activation vectors for every layer
 
         Z = [] # list for weighted input vectors for every layer
 
@@ -43,18 +43,18 @@ class MLFFNN:
             a = self.sigmoid_activation(z)
             # print("z = ", z.shape)
             # print("a = ", a.shape)
-            A.append(a)
+            self.A.append(a)
             
         # output layer
         z = np.matmul(self.weights[-1], a) + self.biases[-1] # z_l = w_l * a_l-1 + b_l
         Z.append(z)
         a = self.linear_activation(z)
-        A.append(a)
+        self.A.append(a)
 
         if (return_final_only):
             return a
         else:
-            return (A, Z)
+            return (self.A, Z)
 
     def backPropagation(self, A, Z, y):
         # print("*** Debug***")
@@ -116,7 +116,8 @@ class MLFFNN:
             global model_output2
             model_output = np.apply_along_axis(self.predictValue, axis=1, arr=train_X)
             model_output2 = np.apply_along_axis(self.predictValue, axis=1, arr=test_X)
-
+            if(e%1000==999):
+                self.midgraphs(test_data[:, :-1])
     def predictValue(self, x):
         return self.feedForward(x, return_final_only=True)
 
@@ -126,7 +127,7 @@ class MLFFNN:
         
         pred=pred.reshape(len(pred))
         error=np.sqrt((((pred-Y)**2).sum())/(2*n))
-
+        
         return error
     
     def test(self, X, Y):
@@ -158,7 +159,40 @@ class MLFFNN:
 #        avg_error.append(error*error)
 
         return error
-
+    
+    def midgraphs(self,X):
+        layer1_val=[]
+        for i in range(0,len(X)):
+            a=self.feedForward(X[i],return_final_only=True)
+            layer1_val.append(self.A[1][3])
+        xxx = [X[i][0] for i in range(0,len(X))]
+        plt.scatter(xxx,layer1_val)
+        plt.title('Hidden Layer node 4')
+        plt.show()
+        layer1_val=[]
+        for i in range(0,len(X)):
+            a=self.feedForward(X[i],return_final_only=True)
+            layer1_val.append(self.A[1][4])
+        xxx = [X[i][0] for i in range(0,len(X))]
+        plt.scatter(xxx,layer1_val)
+        plt.title('Hidden Layer node 5')
+        plt.show()
+        layer1_val=[]
+        for i in range(0,len(X)):
+            a=self.feedForward(X[i],return_final_only=True)
+            layer1_val.append(self.A[1][5])
+        xxx = [X[i][0] for i in range(0,len(X))]
+        plt.scatter(xxx,layer1_val)
+        plt.title('Hidden Layer node 6')
+        plt.show()
+        o_layer=[]
+        for i in range(0,len(X)):
+            a=self.feedForward(X[i],return_final_only=True)
+            o_layer.append(self.A[2][0])
+        xxx = [X[i][0] for i in range(0,len(X))]
+        plt.scatter(xxx,o_layer)
+        plt.title('Output layer node ')
+        plt.show()
     def sigmoid_activation(self, z):
         return 1.0/(1.0+np.exp(-z))
 
