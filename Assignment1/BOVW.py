@@ -106,24 +106,24 @@ def BoVW_image_feature_vector(img_col_hist, centroids):
     feature = np.bincount(points, minlength=len(centroids))
     return feature
 
-train_images = loadImagesFromDir("Group21/Classification/Image_Group21/train")
-test_images = loadImagesFromDir("Group21/Classification/Image_Group21/test")
+# train_images = loadImagesFromDir("Group21/Classification/Image_Group21/train")
+# test_images = loadImagesFromDir("Group21/Classification/Image_Group21/test")
 
 
-train_imgs_hist = getHistForAllImages(train_images, patch_shape=(32, 32))
-test_imgs_hist = getHistForAllImages(test_images, patch_shape=(32, 32))
+# train_imgs_hist = getHistForAllImages(train_images, patch_shape=(32, 32))
+# test_imgs_hist = getHistForAllImages(test_images, patch_shape=(32, 32))
 
-train_imgs_hist_flattened = np.concatenate([y for x in train_imgs_hist.values() for y in x])
+# train_imgs_hist_flattened = np.concatenate([y for x in train_imgs_hist.values() for y in x])
 
-# print(train_imgs_hist_flattened)
+# # print(train_imgs_hist_flattened)
 
-centroids = kmeans(train_imgs_hist_flattened, 32, 100)
+# centroids = kmeans(train_imgs_hist_flattened, 32, 100)
 
-img_BoVW_all = {}
-for img_type, img_hist_array in train_imgs_hist.items():
-    img_BoVW = np.empty((len(img_hist_array), 32), dtype=np.int32)
-    for i in range(len(img_hist_array)):
-        img_BoVW[i] = BoVW_image_feature_vector(img_hist_array[i], centroids)
-    img_BoVW_all[img_type] = img_BoVW
+# img_BoVW_all = {}
+# for img_type, img_hist_array in train_imgs_hist.items():
+#     img_BoVW = np.empty((len(img_hist_array), 32), dtype=np.int32)
+#     for i in range(len(img_hist_array)):
+#         img_BoVW[i] = BoVW_image_feature_vector(img_hist_array[i], centroids)
+#     img_BoVW_all[img_type] = img_BoVW
 
-img_BoVW_all["batters_box"][0]
+# img_BoVW_all["batters_box"][0]
